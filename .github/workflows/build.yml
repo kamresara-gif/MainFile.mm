@@ -12,39 +12,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Force Clean and Setup
+      - name: Setup Environment
         run: |
-          # مسح أي بقايا قديمة من محاولات سابقة
-          sudo rm -rf /opt/theos
-          sudo mkdir -p /opt/theos
-          
-          # تثبيت الاعتماديات الأساسية فقط
+          # تثبيت المحول البرمجي مباشرة من مستودعات Ubuntu
           sudo apt-get update
-          sudo apt-get install -y git build-essential clang
+          sudo apt-get install -y clang make git
           
-          # تحميل Theos يدوياً بدون سكربتات معقدة
-          git clone --recursive https://github.com/theos/theos /opt/theos
-          
-          # تحميل الـ Toolchain يدوياً لضمان عدم حدوث خطأ 128
-          git clone https://github.com/theos/toolchain-linux /opt/theos/toolchain/linux
+          # إعداد هيكل Theos البسيط بدون الحاجة لتحميل الـ Toolchain المعقد
+          sudo mkdir -p /opt/theos
+          # تحميل النواة فقط
+          git clone --depth 1 https://github.com/theos/theos /opt/theos
           
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
-
-      - name: Setup SDKs
-        run: |
-          # مسح مجلد SDKs القديم إذا وجد
-          sudo rm -rf /opt/theos/sdks
-          sudo mkdir -p /opt/theos/sdks
-          # تحميل الـ SDKs
-          git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
 
       - name: Compile
         run: |
           export THEOS=/opt/theos
           export PATH=$PATH:$THEOS/bin
-          # تأكد أن اسم المجلد هنا يطابق اسم المجلد في مستودعك
-          # إذا كان المجلد الرئيسي هو نفسه، احذف cd
+          # التنقل للمجلد الذي يحتوي على Makefile
           cd iOS-Simple-IGG-Mod-Menu-main
+          # استخدام clang المثبت في النظام مباشرة بدلاً من المفقود
           make clean
           make package FINALPACKAGE=1
 
