@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    # تغيير الـ Runner إلى ubuntu-latest لتقليل مشاكل الـ macOS
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -15,18 +14,15 @@ jobs:
 
       - name: Setup Theos
         run: |
-          # تثبيت الاعتماديات الأساسية
           sudo apt-get update
           sudo apt-get install -y git build-essential
-          # تثبيت Theos يدوياً من المستودع الأصلي
           git clone --recursive https://github.com/theos/theos /opt/theos
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
 
       - name: Download iOS SDKs
         run: |
-          # تحميل الـ SDKs من رابط بديل أو مباشر إذا أمكن
+          sudo rm -rf /opt/theos/sdks
           sudo mkdir -p /opt/theos/sdks
-          # محاولة تحميل الـ SDKs المحددة
           git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
 
       - name: Compile Tweak Package
