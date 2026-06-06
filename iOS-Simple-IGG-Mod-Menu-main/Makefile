@@ -19,4 +19,3 @@ IGGMain_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-unused-variable -W
 IGGMain_FILES = MainFile.mm $(wildcard SCLAlertView/*.m) $(wildcard SupportFile/*.m)
 
 include $(THEOS)/makefiles/tweak.mk
-
