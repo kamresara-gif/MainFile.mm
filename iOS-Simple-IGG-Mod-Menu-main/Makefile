@@ -1,5 +1,4 @@
-# تحديث المسار ليتوافق مع خادم GitHub
-export THEOS = /Users/runner/theos
+export THEOS = /opt/theos
 
 TARGET := iphone:clang:latest:14.0
 ARCHS = arm64
@@ -17,11 +16,10 @@ IGGMain_LDFLAGS += -F. -framework JRMemory
 IGGMain_CCFLAGS = -std=c++11 -fno-rtti -fno-exceptions -DNDEBUG
 IGGMain_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-value
 
-# إضافة فحص للتأكد من وجود الملفات قبل البدء
 all: check_files
 check_files:
- @if [ ! -d "SCLAlertView" ]; then echo "Error: SCLAlertView folder missing!"; exit 1; fi
- @if [ ! -d "SupportFile" ]; then echo "Error: SupportFile folder missing!"; exit 1; fi
+ @if [ ! -d "SCLAlertView" ]; then exit 1; fi
+ @if [ ! -d "SupportFile" ]; then exit 1; fi
 
 IGGMain_FILES = MainFile.mm $(wildcard SCLAlertView/*.m) $(wildcard SupportFile/*.m)
 
