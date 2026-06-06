@@ -16,21 +16,27 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y git build-essential clang
+          # Manually clone Theos to avoid the problematic installation script
           git clone --recursive https://github.com/theos/theos /opt/theos
+          
+          # Manually install the Linux toolchain
           sudo mkdir -p /opt/theos/toolchain
           git clone https://github.com/theos/toolchain-linux /opt/theos/toolchain/linux
+          
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
 
       - name: Download iOS SDKs
         run: |
-          sudo rm -rf /opt/theos/sdks
+          # Use a direct clone with retry logic to bypass API failures
           sudo mkdir -p /opt/theos/sdks
-          git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
+          git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks || \
+          (echo "Retrying SDK download..." && sleep 10 && git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks)
 
       - name: Compile Tweak Package
         run: |
           export THEOS=/opt/theos
           export PATH=$PATH:$THEOS/bin
+          # Ensure we are in the correct directory
           cd iOS-Simple-IGG-Mod-Menu-main
           make clean
           make package FINALPACKAGE=1
