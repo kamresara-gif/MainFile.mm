@@ -16,11 +16,6 @@ IGGMain_LDFLAGS += -F. -framework JRMemory
 IGGMain_CCFLAGS = -std=c++11 -fno-rtti -fno-exceptions -DNDEBUG
 IGGMain_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-unused-variable -Wno-unused-value
 
-all: check_files
-check_files:
- @if [ ! -d "SCLAlertView" ]; then exit 1; fi
- @if [ ! -d "SupportFile" ]; then exit 1; fi
-
 IGGMain_FILES = MainFile.mm $(wildcard SCLAlertView/*.m) $(wildcard SupportFile/*.m)
 
 include $(THEOS)/makefiles/tweak.mk
