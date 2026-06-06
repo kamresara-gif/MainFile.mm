@@ -14,28 +14,25 @@ jobs:
 
       - name: Setup Environment
         run: |
-          # 1. Update and install all necessary dependencies
           sudo apt-get update
-          sudo apt-get install -y clang make git perl debianutils build-essential
+          sudo apt-get install -y clang make git perl debianutils
           
-          # 2. Setup Theos in /opt/theos
+          # إعداد Theos
           sudo mkdir -p /opt/theos
           git clone --depth 1 https://github.com/theos/theos /opt/theos
           
-          # 3. Export environment variables
+          # الحل الجذري: تحميل ملف dm.pl المفقود يدوياً ووضعه في مساره الصحيح
+          sudo mkdir -p /opt/theos/bin
+          sudo curl -L https://raw.githubusercontent.com/theos/theos/master/bin/dm.pl -o /opt/theos/bin/dm.pl
+          sudo chmod +x /opt/theos/bin/dm.pl
+          
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
           echo "/opt/theos/bin" >> $GITHUB_PATH
 
       - name: Compile
         run: |
-          # Ensure environment variables are active
           export THEOS=/opt/theos
-          export PATH=$PATH:$THEOS/bin
-          
-          # Navigate to project directory
           cd iOS-Simple-IGG-Mod-Menu-main
-          
-          # Build process
           make clean
           make package FINALPACKAGE=1
 
