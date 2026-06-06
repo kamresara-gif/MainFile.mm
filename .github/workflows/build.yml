@@ -12,41 +12,37 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Clean and Setup Environment
+      - name: Setup Environment
         run: |
-          # تنظيف كامل للمسارات لمنع التضارب
-          sudo rm -rf /opt/theos
-          sudo mkdir -p /opt/theos
+          # التنصيب في المجلد المحلي للمشروع بدلاً من /opt/
+          export THEOS=$GITHUB_WORKSPACE/theos
+          mkdir -p $THEOS
           
-          # تثبيت الأدوات الضرورية
           sudo apt-get update
           sudo apt-get install -y clang make git perl debianutils
           
-          # تحميل Theos
-          git clone --depth 1 https://github.com/theos/theos /opt/theos
+          # تحميل Theos في مسار العمل
+          git clone --depth 1 https://github.com/theos/theos $THEOS
           
           # تحميل الـ SDKs
-          sudo mkdir -p /opt/theos/sdks
-          git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
+          mkdir -p $THEOS/sdks
+          git clone --depth 1 https://github.com/theos/sdks.git $THEOS/sdks
           
-          # التأكد من وجود dm.pl
-          if [ ! -f /opt/theos/bin/dm.pl ]; then
-            sudo curl -L https://raw.githubusercontent.com/theos/theos/master/bin/dm.pl -o /opt/theos/bin/dm.pl
-            sudo chmod +x /opt/theos/bin/dm.pl
-          fi
+          # إعداد dm.pl
+          curl -L https://raw.githubusercontent.com/theos/theos/master/bin/dm.pl -o $THEOS/bin/dm.pl
+          chmod +x $THEOS/bin/dm.pl
           
-          echo "THEOS=/opt/theos" >> $GITHUB_ENV
-          echo "/opt/theos/bin" >> $GITHUB_PATH
+          echo "THEOS=$THEOS" >> $GITHUB_ENV
+          echo "$THEOS/bin" >> $GITHUB_PATH
 
-      - name: Compile Tweak
+      - name: Compile
         run: |
-          export THEOS=/opt/theos
-          # تأكد أن اسم المجلد بالأسفل هو نفس اسم المجلد في مستودعك
+          # تأكد أن اسم المجلد بالأسفل يطابق اسم المجلد في مستودعك
           cd iOS-Simple-IGG-Mod-Menu-main
           make clean
           make package FINALPACKAGE=1
 
-      - name: Upload Artifact
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: tweak-package
