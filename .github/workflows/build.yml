@@ -12,32 +12,33 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Clean and Prepare Environment
+      - name: Clean and Setup
         run: |
-          # تنظيف قسري للمسارات التي تسبب التضارب
+          # تنظيف شامل لكل ما يتعلق بـ Theos قبل البدء
           sudo rm -rf /opt/theos
           sudo mkdir -p /opt/theos
           
-          # تثبيت الأدوات الضرورية
+          # تثبيت الأدوات
           sudo apt-get update
           sudo apt-get install -y clang make git perl debianutils
           
           # تحميل Theos
           git clone --depth 1 https://github.com/theos/theos /opt/theos
           
-          # تحميل SDKs مع التحقق من المسار
-          sudo mkdir -p /opt/theos/sdks
+          # تحميل SDKs مع التحقق من عدم وجود المجلد مسبقاً
+          sudo rm -rf /opt/theos/sdks
           git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
           
-          # تحميل dm.pl
+          # إعداد dm.pl
           sudo curl -L https://raw.githubusercontent.com/theos/theos/master/bin/dm.pl -o /opt/theos/bin/dm.pl
           sudo chmod +x /opt/theos/bin/dm.pl
+          
+          echo "THEOS=/opt/theos" >> $GITHUB_ENV
+          echo "/opt/theos/bin" >> $GITHUB_PATH
 
       - name: Compile Tweak
         run: |
           export THEOS=/opt/theos
-          export PATH=$PATH:$THEOS/bin
-          # تأكد أن اسم المجلد بالأسفل يطابق اسم المجلد الحقيقي في مستودعك
           cd iOS-Simple-IGG-Mod-Menu-main
           make clean
           make package FINALPACKAGE=1
