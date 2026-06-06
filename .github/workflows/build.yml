@@ -12,15 +12,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      # هذا هو الجزء الذي سألت عنه، قمت بتحديثه ليشمل الحزم المطلوبة
       - name: Setup Environment
         run: |
-          # تثبيت المحول البرمجي مباشرة من مستودعات Ubuntu
           sudo apt-get update
-          sudo apt-get install -y clang make git
+          # إضافة perl و debianutils لضمان وجود dm.pl
+          sudo apt-get install -y clang make git perl debianutils
           
-          # إعداد هيكل Theos البسيط بدون الحاجة لتحميل الـ Toolchain المعقد
           sudo mkdir -p /opt/theos
-          # تحميل النواة فقط
           git clone --depth 1 https://github.com/theos/theos /opt/theos
           
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
@@ -29,9 +28,8 @@ jobs:
         run: |
           export THEOS=/opt/theos
           export PATH=$PATH:$THEOS/bin
-          # التنقل للمجلد الذي يحتوي على Makefile
+          # تأكد من اسم المجلد هنا، إذا كان اسم مجلدك مختلفاً قم بتغييره
           cd iOS-Simple-IGG-Mod-Menu-main
-          # استخدام clang المثبت في النظام مباشرة بدلاً من المفقود
           make clean
           make package FINALPACKAGE=1
 
