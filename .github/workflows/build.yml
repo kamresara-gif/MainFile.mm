@@ -7,30 +7,32 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    # تغيير الـ Runner إلى ubuntu-latest لتقليل مشاكل الـ macOS
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Install Theos Framework
+      - name: Setup Theos
         run: |
-          # تثبيت Theos والتأكد من وجود المسار
-          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
-          echo "THEOS=/Users/runner/theos" >> $GITHUB_ENV
+          # تثبيت الاعتماديات الأساسية
+          sudo apt-get update
+          sudo apt-get install -y git build-essential
+          # تثبيت Theos يدوياً من المستودع الأصلي
+          git clone --recursive https://github.com/theos/theos /opt/theos
+          echo "THEOS=/opt/theos" >> $GITHUB_ENV
 
       - name: Download iOS SDKs
         run: |
-          # استخدام --depth 1 لتقليل حجم التحميل مع آلية إعادة محاولة
-          if [ ! -d "/Users/runner/theos/sdks" ]; then
-            echo "Cloning SDKs..."
-            git clone --depth 1 https://github.com/theos/sdks.git /Users/runner/theos/sdks || \
-            (echo "Retrying..." && sleep 5 && git clone --depth 1 https://github.com/theos/sdks.git /Users/runner/theos/sdks)
-          fi
+          # تحميل الـ SDKs من رابط بديل أو مباشر إذا أمكن
+          sudo mkdir -p /opt/theos/sdks
+          # محاولة تحميل الـ SDKs المحددة
+          git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
 
       - name: Compile Tweak Package
         run: |
-          # التأكد من تصدير مسار THEOS قبل التشغيل
-          export THEOS=/Users/runner/theos
+          export THEOS=/opt/theos
+          export PATH=$PATH:$THEOS/bin
           make clean
           make package FINALPACKAGE=1
 
