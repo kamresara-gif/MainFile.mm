@@ -21,7 +21,11 @@ jobs:
           
       - name: Download iOS SDKs
         run: |
-          git clone https://github.com/theos/sdks /Users/runner/theos/sdks
+          if [ ! -d "/Users/runner/theos/sdks" ]; then
+            git clone https://github.com/theos/sdks /Users/runner/theos/sdks
+          else
+            echo "SDKs already exist, skipping clone."
+          fi
           
       - name: Compile Tweak Package
         run: |
