@@ -1,3 +1,4 @@
+
 name: Tweak Cloud Compiler
 
 on:
@@ -12,7 +13,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Environment
+      - name: Setup Environment and SDKs
         run: |
           sudo apt-get update
           sudo apt-get install -y clang make git perl debianutils
@@ -21,8 +22,11 @@ jobs:
           sudo mkdir -p /opt/theos
           git clone --depth 1 https://github.com/theos/theos /opt/theos
           
-          # الحل الجذري: تحميل ملف dm.pl المفقود يدوياً ووضعه في مساره الصحيح
-          sudo mkdir -p /opt/theos/bin
+          # إعداد الـ SDKs في مسارها الصحيح بدقة
+          sudo mkdir -p /opt/theos/sdks
+          git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
+          
+          # تحميل dm.pl يدوياً
           sudo curl -L https://raw.githubusercontent.com/theos/theos/master/bin/dm.pl -o /opt/theos/bin/dm.pl
           sudo chmod +x /opt/theos/bin/dm.pl
           
@@ -32,6 +36,7 @@ jobs:
       - name: Compile
         run: |
           export THEOS=/opt/theos
+          # التأكد من المسار قبل التجميع
           cd iOS-Simple-IGG-Mod-Menu-main
           make clean
           make package FINALPACKAGE=1
