@@ -1,1 +1,35 @@
 
+name: Tweak Cloud Compiler
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Theos Framework
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          echo "THEOS=/Users/runner/theos" >> $GITHUB_ENV
+          
+      - name: Download iOS SDKs
+        run: |
+          git clone https://github.com/theos/sdks /Users/runner/theos/sdks
+          
+      - name: Compile Tweak Package
+        run: |
+          export THEOS=/Users/runner/theos
+          make package FINALPACKAGE=1
+          
+      - name: Upload Finished .deb Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-tweak
+          path: packages/*.deb
