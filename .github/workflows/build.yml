@@ -14,21 +14,22 @@ jobs:
 
       - name: Install Theos Framework
         run: |
+          # تثبيت Theos والتأكد من وجود المسار
           bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
           echo "THEOS=/Users/runner/theos" >> $GITHUB_ENV
 
       - name: Download iOS SDKs
         run: |
+          # استخدام --depth 1 لتقليل حجم التحميل مع آلية إعادة محاولة
           if [ ! -d "/Users/runner/theos/sdks" ]; then
             echo "Cloning SDKs..."
             git clone --depth 1 https://github.com/theos/sdks.git /Users/runner/theos/sdks || \
-            (echo "First attempt failed, retrying..." && sleep 5 && git clone --depth 1 https://github.com/theos/sdks.git /Users/runner/theos/sdks)
-          else
-            echo "SDKs already exist, skipping clone."
+            (echo "Retrying..." && sleep 5 && git clone --depth 1 https://github.com/theos/sdks.git /Users/runner/theos/sdks)
           fi
 
       - name: Compile Tweak Package
         run: |
+          # التأكد من تصدير مسار THEOS قبل التشغيل
           export THEOS=/Users/runner/theos
           make clean
           make package FINALPACKAGE=1
