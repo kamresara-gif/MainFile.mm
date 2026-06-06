@@ -12,24 +12,30 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # هذا هو الجزء الذي سألت عنه، قمت بتحديثه ليشمل الحزم المطلوبة
       - name: Setup Environment
         run: |
+          # 1. Update and install all necessary dependencies
           sudo apt-get update
-          # إضافة perl و debianutils لضمان وجود dm.pl
-          sudo apt-get install -y clang make git perl debianutils
+          sudo apt-get install -y clang make git perl debianutils build-essential
           
+          # 2. Setup Theos in /opt/theos
           sudo mkdir -p /opt/theos
           git clone --depth 1 https://github.com/theos/theos /opt/theos
           
+          # 3. Export environment variables
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
+          echo "/opt/theos/bin" >> $GITHUB_PATH
 
       - name: Compile
         run: |
+          # Ensure environment variables are active
           export THEOS=/opt/theos
           export PATH=$PATH:$THEOS/bin
-          # تأكد من اسم المجلد هنا، إذا كان اسم مجلدك مختلفاً قم بتغييره
+          
+          # Navigate to project directory
           cd iOS-Simple-IGG-Mod-Menu-main
+          
+          # Build process
           make clean
           make package FINALPACKAGE=1
 
