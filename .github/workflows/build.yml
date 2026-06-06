@@ -12,38 +12,40 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Environment
+      - name: Clean and Setup
         run: |
-          # تنظيف أي بقايا في مسارات النظام الافتراضية
+          # 1. تنظيف شامل وجذري باستخدام أسماء مسارات مختلفة
           sudo rm -rf /opt/theos
+          sudo mkdir -p /opt/theos
           
-          # تثبيت الحزم المطلوبة
+          # 2. تثبيت الحزم المطلوبة
           sudo apt-get update
           sudo apt-get install -y clang make git perl debianutils
           
-          # تحميل Theos في مجلد فريد
+          # 3. تحميل Theos واستخدام خيار depth 1 لتقليل التضارب
           git clone --depth 1 https://github.com/theos/theos /opt/theos
           
-          # تحميل الـ SDKs في مسار مختلف تماماً لتجنب التداخل
+          # 4. تحميل SDKs في مجلد فرعي جديد
           sudo mkdir -p /opt/theos/sdks
           git clone --depth 1 https://github.com/theos/sdks.git /opt/theos/sdks
           
-          # تحميل أداة dm.pl الضرورية لإنشاء ملفات deb
+          # 5. تنزيل dm.pl مباشرة لضمان عدم فقده
           sudo curl -L https://raw.githubusercontent.com/theos/theos/master/bin/dm.pl -o /opt/theos/bin/dm.pl
           sudo chmod +x /opt/theos/bin/dm.pl
           
-          # إعداد المتغيرات
           echo "THEOS=/opt/theos" >> $GITHUB_ENV
           echo "/opt/theos/bin" >> $GITHUB_PATH
 
       - name: Compile
         run: |
+          # التأكد من المتغيرات
           export THEOS=/opt/theos
-          # الانتقال إلى المجلد الذي يحتوي على الكود الخاص بك
-          # تأكد أن المجلد المذكور هنا مطابق تماماً لمجلد مشروعك في الـ Repository
+          
+          # الانتقال للمجلد الصحيح
+          # تأكد أن اسم المجلد بالأسفل يطابق اسم المجلد في مستودعك
           cd iOS-Simple-IGG-Mod-Menu-main
           
-          # تجميع المشروع
+          # التجميع
           make clean
           make package FINALPACKAGE=1
 
