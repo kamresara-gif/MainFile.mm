@@ -29,6 +29,8 @@ jobs:
         run: |
           export THEOS=/opt/theos
           export PATH=$PATH:$THEOS/bin
+          # Navigate into the subfolder where your Makefile is located
+          cd iOS-Simple-IGG-Mod-Menu-main
           make clean
           make package FINALPACKAGE=1
 
@@ -36,4 +38,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: compiled-tweak
-          path: packages/*.deb
+          # Adjusted path to match the subfolder structure
+          path: iOS-Simple-IGG-Mod-Menu-main/packages/*.deb
